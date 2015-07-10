@@ -19,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
         if(currentUser==null) {
             navigateToLogin();
         }
+        startService(new Intent(getApplicationContext(), ChatHeadService.class));
 
     }
 
