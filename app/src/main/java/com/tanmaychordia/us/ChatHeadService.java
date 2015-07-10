@@ -11,6 +11,7 @@ import android.graphics.Rect;
 import android.os.IBinder;
 import android.view.Gravity;
 import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -19,16 +20,19 @@ public class ChatHeadService extends Service {
 
     private WindowManager windowManager;
     private ImageView chatHead;
-    private int width = 200;
-    private int height = 200;
-
+    private int width = 150;
+    private int height = width;
+    private int currentImage;
     @Override public IBinder onBind(Intent intent) {
         // Not used
         return null;
     }
 
-    public void updateImage(int id)
+    public void updateImage(int id, int decrease)
     {
+        width-= decrease;
+        height-=decrease;
+        currentImage = id;
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = false;
 
@@ -38,6 +42,17 @@ public class ChatHeadService extends Service {
         bmp = getRoundedShape(bmp);
         chatHead.setImageBitmap(bmp);
     }
+
+    public void updateImage(int id)
+    {
+        updateImage(id, 0);
+    }
+
+    public void updateSize(int decrease)
+    {
+        updateImage(currentImage,decrease);
+    }
+
     public Bitmap getRoundedShape(Bitmap scaleBitmapImage) {
         int targetWidth = width;
         int targetHeight = height;
@@ -59,6 +74,7 @@ public class ChatHeadService extends Service {
                 new Rect(0, 0, targetWidth, targetHeight), null);
         return targetBitmap;
     }
+
 
     @Override public void onCreate() {
         super.onCreate();
@@ -82,30 +98,104 @@ public class ChatHeadService extends Service {
 
         windowManager.addView(chatHead, params);
 
+
+
         chatHead.setOnTouchListener(new View.OnTouchListener() {
             private int initialX;
             private int initialY;
             private float initialTouchX;
             private float initialTouchY;
+            private boolean isOnClick;
+            private int SCROLL_THRESHOLD = 10;
+            private VelocityTracker mVelocityTracker = null;
+            private int delta = width/10;
+            private void onMove(MotionEvent event)
+            {
+                params.x = initialX + (int) (event.getRawX() - initialTouchX);
+                params.y = initialY + (int) (event.getRawY() - initialTouchY);
+                windowManager.updateViewLayout(chatHead, params);
+            }
+
+            private void onTouch()
+            {
+                updateImage(R.drawable.bangbang);
+
+            }
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                int index = event.getActionIndex();
+                int action = event.getActionMasked();
+                int pointerId = event.getPointerId(index);
+                int vThreshold = 10;
+
                 switch (event.getAction()) {
+
                     case MotionEvent.ACTION_DOWN:
                         initialX = params.x;
                         initialY = params.y;
                         initialTouchX = event.getRawX();
                         initialTouchY = event.getRawY();
-                        return true;
+                        isOnClick = true;
+
+                        updateSize(delta);
+                        if(mVelocityTracker == null) {
+                            // Retrieve a new VelocityTracker object to watch the velocity of a motion.
+                            mVelocityTracker = VelocityTracker.obtain();
+                        }
+                        else {
+                            // Reset the velocity tracker back to its initial state.
+                            mVelocityTracker.clear();
+                        }
+
+
+                        // Add a user's movement to the tracker.
+                        mVelocityTracker.addMovement(event);
+
+                        break;
+
                     case MotionEvent.ACTION_UP:
-                        return true;
+                        if(isOnClick) {
+                            onTouch();
+                        }
+                        updateSize(-delta);
+                        break;
+
+
                     case MotionEvent.ACTION_MOVE:
-                        params.x = initialX + (int) (event.getRawX() - initialTouchX);
-                        params.y = initialY + (int) (event.getRawY() - initialTouchY);
-                        windowManager.updateViewLayout(chatHead, params);
-                        return true;
+
+
+
+
+                        mVelocityTracker.addMovement(event);
+                        // When you want to determine the velocity, call
+                        // computeCurrentVelocity(). Then call getXVelocity()
+                        // and getYVelocity() to retrieve the velocity for each pointer ID.
+                        mVelocityTracker.computeCurrentVelocity(1000);
+                        double xv = mVelocityTracker.getXVelocity();
+                        double yv = mVelocityTracker.getYVelocity();
+                        if (isOnClick && (Math.abs( initialTouchX - event.getRawX()) > SCROLL_THRESHOLD || Math.abs(initialTouchY - event.getRawY()) > SCROLL_THRESHOLD)) {
+//                            Log.i(LOG_TAG, "movement detected");
+                            isOnClick = false;
+                            onMove(event);
+                        }
+                        else if(!isOnClick)
+                        {
+                            onMove(event);
+                        }
+//                        if(Math.sqrt(xv*xv + yv*yv) > vThreshold)
+//                        {
+//                            onMove(event);
+//                            isOnClick = false;
+//                        }
+
+//                        isOnClick = false;
+                        break;
+                    case MotionEvent.ACTION_CANCEL:
+                        mVelocityTracker.recycle();
+                        break;
                 }
-                return false;
+                        return false;
             }
         });
 
