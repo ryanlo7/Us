@@ -47,7 +47,7 @@ public class TouchPaint extends GraphicsActivity {
     private static final int FADE_ID = Menu.FIRST+1;
 
     /** How often to fade the contents of the window (in ms). */
-    private static final int FADE_DELAY = 5;
+    private static final int FADE_DELAY = 50;
 
     /** The view responsible for drawing the window. */
     MyView mView;
@@ -276,8 +276,19 @@ public class TouchPaint extends GraphicsActivity {
             if (mBitmap != null) {
                 float radius = width / 2;
                 int pressureLevel = (int)(pressure * 255);
-                mPaint.setARGB(pressureLevel, 255, 255, 255);
+
+//                RadialGradient gradient = new RadialGradient(x, y, radius, 0xFF6666,
+//                        Color.TRANSPARENT, android.graphics.Shader.TileMode.MIRROR);
+
+
+
+//                mPaint.setShader(gradient);
+                                                                                // set color gradient here
+                mPaint.setARGB(pressureLevel, 255, 102, 102);
+
+
                 mCanvas.drawCircle(x, y, radius, mPaint);
+//                mCanvas.drawCircle(x, y, radius, mPaint);
                 mRect.set((int) (x - radius - 2), (int) (y - radius - 2),
                         (int) (x + radius + 2), (int) (y + radius + 2));
                 invalidate(mRect);

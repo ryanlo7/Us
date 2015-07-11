@@ -7,6 +7,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.parse.ParseUser;
+import com.pubnub.api.Callback;
+import com.pubnub.api.PubnubError;
+import com.pubnub.api.PubnubException;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -15,9 +18,55 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
         ParseUser currentUser = ParseUser.getCurrentUser();
         if(currentUser==null) {
             navigateToLogin();
+            try {
+                UsApp.pubnub.subscribe(currentUser.getObjectId(), new Callback() {
+
+                    @Override
+                    public void connectCallback(String channel, Object message) {
+                        UsApp.pubnub.publish("my_channel", "Hello from the PubNub Java SDK", new Callback() {});
+                    }
+
+                    @Override
+                    public void disconnectCallback(String channel, Object message) {
+                        System.out.println("SUBSCRIBE : DISCONNECT on channel:" + channel
+                                + " : " + message.getClass() + " : "
+                                + message.toString());
+                    }
+
+                    public void reconnectCallback(String channel, Object message) {
+                        System.out.println("SUBSCRIBE : RECONNECT on channel:" + channel
+                                + " : " + message.getClass() + " : "
+                                + message.toString());
+                    }
+
+                    @Override
+                    public void successCallback(String channel, Object message) {
+                        System.out.println("SUBSCRIBE : " + channel + " : "
+                                + message.getClass() + " : " + message.toString());
+                    }
+
+                    @Override
+                    public void errorCallback(String channel, PubnubError error) {
+                        System.out.println("SUBSCRIBE : ERROR on channel " + channel
+                                + " : " + error.toString());
+                    }
+                });
+            }
+            catch(PubnubException e)
+            {
+               System.out.print( e);
+            }
+        }
+        else
+        {
+            String id = currentUser.getObjectId();
+
+
         }
         startService(new Intent(getApplicationContext(), ChatHeadService.class));
 
