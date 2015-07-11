@@ -80,8 +80,10 @@ public class ChatHeadService extends Service {
         super.onCreate();
 
         windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
-        chatHead = new ImageView(this);
 
+
+        chatHead = new ImageView(this);
+        chatHead.setElevation(20);
         updateImage(R.drawable.skulduggerycool);//image is your image
 
 
@@ -95,6 +97,7 @@ public class ChatHeadService extends Service {
         params.gravity = Gravity.TOP | Gravity.LEFT;
         params.x = 0;
         params.y = 100;
+        
 
         windowManager.addView(chatHead, params);
 

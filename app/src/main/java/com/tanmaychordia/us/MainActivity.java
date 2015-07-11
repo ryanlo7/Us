@@ -21,6 +21,9 @@ public class MainActivity extends AppCompatActivity {
         }
         startService(new Intent(getApplicationContext(), ChatHeadService.class));
 
+        Intent intent = new Intent(this, TouchPaint.class);
+        startActivity(intent);
+
     }
 
     private void navigateToLogin() {
