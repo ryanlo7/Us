@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
@@ -25,8 +24,9 @@ public class ChatHeadService extends Service {
     public static ImageView chatHead;
     public static int width = 150;
     public static int height = width;
-    private int currentImage;
-    private boolean isDrawActive = false;
+    public static int currentColor;
+    public static boolean isDrawActive = false;
+//    private ColorPopup cp;
     public static boolean moveable = true;
     @Override public IBinder onBind(Intent intent) {
         // Not used
@@ -36,35 +36,36 @@ public class ChatHeadService extends Service {
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.TYPE_PHONE,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+            /*|WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY*/,
             PixelFormat.TRANSLUCENT);
 
-    public void updateImage(int id, int decrease)
+    public static void updateImage(int color, int decrease)
     {
         width-= decrease;
         height-=decrease;
-        currentImage = id;
+        currentColor = color;
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = false;
 
         Bitmap bmp=Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);;//image is your image
-        bmp.eraseColor(Color.RED);
+        bmp.eraseColor(color);
 //        bmp=Bitmap.createScaledBitmap(bmp, width,height, true);
         bmp = getRoundedShape(bmp);
         chatHead.setImageBitmap(bmp);
     }
 
-    public void updateImage(int id)
+    public static void updateImage(int id)
     {
         updateImage(id, 0);
     }
 
-    public void updateSize(int decrease)
+    public static void updateSize(int decrease)
     {
-        updateImage(currentImage, decrease);
+        updateImage(currentColor, decrease);
     }
 
-    public Bitmap getRoundedShape(Bitmap scaleBitmapImage) {
+    public static Bitmap getRoundedShape(Bitmap scaleBitmapImage) {
         int targetWidth = width;
         int targetHeight = height;
         Bitmap targetBitmap = Bitmap.createBitmap(targetWidth,
@@ -129,20 +130,21 @@ public class ChatHeadService extends Service {
 
             private void onTouch()
             {
-//                updateImage(R.drawable.bangbang);
-//                Intent i = new Intent();
-//                i.setClass(ChatHeadService.this, TouchPaint.class);
-//                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                startActivity(i);
+
                 moveable = true;
-                if(!isDrawActive)
+
+                if(!isDrawActive) {
                     startService(new Intent(getApplicationContext(), DrawingService.class));
+//                    ColorPopup cp; // = new ColorPopup(ChatHeadService.this);
+//                    cp = new ColorPopup(ChatHeadService.this);
+                }
                 else
                 {
-
+//                    cp.dismiss();
                     stopService(new Intent(getApplicationContext(), DrawingService.class));
                 }
                 isDrawActive = !isDrawActive;
+
             }
 
             @Override
