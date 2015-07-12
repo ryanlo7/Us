@@ -1,8 +1,12 @@
 package com.tanmaychordia.us;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.parse.Parse;
+import com.parse.ParseException;
+import com.parse.ParsePush;
+import com.parse.SaveCallback;
 import com.pubnub.api.Pubnub;
 
 /**
@@ -22,7 +26,16 @@ public class UsApp extends Application {
 
         Parse.initialize(this, "dyWJIWnj9GVRHJWy3xUXYt5hmWgtQQR5uSoUOM0T", "vaGQ8S3Eh04T8iC1Fg5VVcdbOZojncXLEzDMcdWK");
 
-
+        ParsePush.subscribeInBackground("", new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    Log.d("com.parse.push", "successfully subscribed to the broadcast channel.");
+                } else {
+                    Log.e("com.parse.push", "failed to subscribe for push", e);
+                }
+            }
+        });
 
 
 

@@ -12,4 +12,24 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="title_activity_chart">ChartActivity</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <string name="textfield_username">Change Username</string>
+
+    <string name="email_address">Change Email</string>
+    <string name="email_hint">Change Email</string>
+
+    <string name="Rbutton_male">Male</string>
+    <string name="Rbutton_female">Female</string>
+    <string name="Rbutton_other">Other</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="other">Other</string>
+
+    <string name="textfield_significantOther">Edit Significant Other</string>
+
+    <string name="male_tips">Subscribe for Male Tips</string>
+    <string name="female_tips">Subscribe for Female Tips</string>
+    <string name="share_significantOther">Share with Significant Other</string>
+
 </resources>
