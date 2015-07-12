@@ -24,15 +24,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+//        ParseUser.logOut();
         ParseUser currentUser = ParseUser.getCurrentUser();
+
         if(currentUser==null) {
             navigateToLogin();
         }
         else
         {
             try {
-                currentUser.fetchIfNeeded();
+                currentUser.fetch();
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -45,10 +46,21 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        ArrayList<String> data =  (ArrayList<String>)currentUser.get("modelHistory");
+        ArrayList<Integer> data =(ArrayList<Integer>)currentUser.get("moodHistory");
 
-        BarData bdata = new BarData(data);
+        System.out.println(data.isEmpty());
+        ArrayList<String> a = new ArrayList<>();
+        for(int ab:data)
+        {
+            a.add(ab + "");
+        }
+        System.out.println(a);
+        BarData bdata = new BarData(a);
 
+        bchart.setData(bdata);
+        bchart.setFocusable(true);
+        bchart.setLogEnabled(true);
+        bchart.invalidate();
         startService(new Intent(getApplicationContext(), ChatHeadService.class));
 
 //        Intent intent = new Intent(this, TouchPaint.class);
