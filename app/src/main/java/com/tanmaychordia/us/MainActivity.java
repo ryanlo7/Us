@@ -1,7 +1,6 @@
 package com.tanmaychordia.us;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -25,52 +24,45 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+//        ParseUser.logOut();
         ParseUser currentUser = ParseUser.getCurrentUser();
-        if (currentUser == null) {
+
+        if(currentUser==null) {
             navigateToLogin();
-        } else {
+        }
+        else {
             try {
-                currentUser.fetchIfNeeded();
+                currentUser.fetch();
             } catch (ParseException e) {
                 e.printStackTrace();
             }
 //            String id = currentUser.getObjectId();
             UsApp.myId = currentUser.getObjectId();
 //
-        }
-//        bchart = (BarChart) findViewById(R.id.bchart);
-//        schart = (ScatterChart) findViewById(R.id.schart);
-//
-//
-//        ArrayList<String> data = (ArrayList<String>) currentUser.get("moodHistory");
-//
-//        BarData bdata = new BarData(data);
-//
-//        startService(new Intent(getApplicationContext(), ChatHeadService.class));
+
+            bchart = (BarChart) findViewById(R.id.bchart);
+            schart = (ScatterChart) findViewById(R.id.schart);
+
+
+            ArrayList<Integer> data = (ArrayList<Integer>) currentUser.get("moodHistory");
+
+            System.out.println(data.isEmpty());
+            ArrayList<String> a = new ArrayList<String>();
+            for (int ab : data) {
+                a.add(ab + "");
+            }
+            System.out.println(a);
+            BarData bdata = new BarData(a);
+
+            bchart.setData(bdata);
+            bchart.setFocusable(true);
+            bchart.setLogEnabled(true);
+            bchart.invalidate();
+            startService(new Intent(getApplicationContext(), ChatHeadService.class));
 
 //        Intent intent = new Intent(this, TouchPaint.class);
 //        startActivity(intent);
-
-        //ADDED THIS
-        LineColorPicker colorPicker = (LineColorPicker) findViewById(R.id.picker);
-
-// set color palette
-        colorPicker.setColors(new int[] {Color.RED,Color.GREEN,Color.BLUE,Color.YELLOW});
-
-// set selected color [optional]
-        colorPicker.setSelectedColor(Color.RED);
-
-// set on change listener
-        colorPicker.setOnColorChangedListener(new OnColorChangedListener() {
-            @Override
-            public void onColorChanged(int c) {
-                //Log.d(TAG, "Selected color " + Integer.toHexString(c));
-            }
-        });
-
-// get selected color
-        int color = colorPicker.getColor();
+        }
     }
 
     private void navigateToLogin() {
