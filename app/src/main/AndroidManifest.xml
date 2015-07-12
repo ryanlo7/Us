@@ -57,14 +57,10 @@
             android:exported="true" >
         </service>
 
-
+       
         <activity
             android:name=".ChartActivity"
             android:label="@string/title_activity_chart" >
-        </activity>
-        <activity
-            android:name=".Settings"
-            android:label="@string/title_activity_settings" >
         </activity>
     </application>
 
