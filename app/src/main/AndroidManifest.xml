@@ -60,6 +60,12 @@
             android:name=".GraphicsActivity"
             android:label="@string/title_activity_graphics" >
         </activity>
+
+        <service
+            android:name=".DrawingService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>

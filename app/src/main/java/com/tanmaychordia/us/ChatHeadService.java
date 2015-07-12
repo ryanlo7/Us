@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Path;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
@@ -18,15 +19,25 @@ import android.widget.ImageView;
 
 public class ChatHeadService extends Service {
 
-    private WindowManager windowManager;
-    private ImageView chatHead;
-    private int width = 150;
-    private int height = width;
+    private static int curX;
+    private static int curY;
+    public static WindowManager windowManager;
+    public static ImageView chatHead;
+    public static int width = 150;
+    public static int height = width;
     private int currentImage;
+    private boolean isDrawActive = false;
+    public static boolean moveable = true;
     @Override public IBinder onBind(Intent intent) {
         // Not used
         return null;
     }
+    public static final WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.TYPE_PHONE,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+            PixelFormat.TRANSLUCENT);
 
     public void updateImage(int id, int decrease)
     {
@@ -36,10 +47,10 @@ public class ChatHeadService extends Service {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inScaled = false;
 
-        Bitmap bmp= BitmapFactory.decodeResource(getResources(), id, options);//image is your image
-
+        Bitmap bmp=Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);;//image is your image
+        bmp.eraseColor(Color.RED);
 //        bmp=Bitmap.createScaledBitmap(bmp, width,height, true);
-        bmp = getRoundedShape(bmp);
+        bmp = getRoundedShape(bmp); 
         chatHead.setImageBitmap(bmp);
     }
 
@@ -50,7 +61,7 @@ public class ChatHeadService extends Service {
 
     public void updateSize(int decrease)
     {
-        updateImage(currentImage,decrease);
+        updateImage(currentImage, decrease);
     }
 
     public Bitmap getRoundedShape(Bitmap scaleBitmapImage) {
@@ -87,17 +98,12 @@ public class ChatHeadService extends Service {
         updateImage(R.drawable.skulduggerycool);//image is your image
 
 
-        final WindowManager.LayoutParams params = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.TYPE_PHONE,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT);
+
 
         params.gravity = Gravity.TOP | Gravity.LEFT;
         params.x = 0;
         params.y = 100;
-        
+
 
         windowManager.addView(chatHead, params);
 
@@ -114,15 +120,29 @@ public class ChatHeadService extends Service {
             private int delta = width/10;
             private void onMove(MotionEvent event)
             {
-                params.x = initialX + (int) (event.getRawX() - initialTouchX);
-                params.y = initialY + (int) (event.getRawY() - initialTouchY);
-                windowManager.updateViewLayout(chatHead, params);
+                if(moveable) {
+                    params.x = initialX + (int) (event.getRawX() - initialTouchX);
+                    params.y = initialY + (int) (event.getRawY() - initialTouchY);
+                    windowManager.updateViewLayout(chatHead, params);
+                }
             }
 
             private void onTouch()
             {
-                updateImage(R.drawable.bangbang);
+//                updateImage(R.drawable.bangbang);
+//                Intent i = new Intent();
+//                i.setClass(ChatHeadService.this, TouchPaint.class);
+//                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivity(i);
+                moveable = true;
+                if(!isDrawActive)
+                    startService(new Intent(getApplicationContext(), DrawingService.class));
+                else
+                {
 
+                    stopService(new Intent(getApplicationContext(), DrawingService.class));
+                }
+                isDrawActive = !isDrawActive;
             }
 
             @Override
@@ -180,6 +200,7 @@ public class ChatHeadService extends Service {
                         if (isOnClick && (Math.abs( initialTouchX - event.getRawX()) > SCROLL_THRESHOLD || Math.abs(initialTouchY - event.getRawY()) > SCROLL_THRESHOLD)) {
 //                            Log.i(LOG_TAG, "movement detected");
                             isOnClick = false;
+
                             onMove(event);
                         }
                         else if(!isOnClick)

@@ -1,50 +1,28 @@
-/*
- * Copyright (C) 2007 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.tanmaychordia.us;
 
+import android.app.Service;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
 import android.graphics.Rect;
-import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 
-//Need the following import to get access to the app resources, since this
-//class is in a sub-package.
+public class DrawingService extends Service {
 
-
-/**
- * Demonstrates the handling of touch screen and trackball events to
- * implement a simple painting app.
- */
-public class TouchPaint extends GraphicsActivity {
+    private WindowManager windowManager;
     /** Used as a pulse to gradually fade the contents of the window. */
     private static final int FADE_MSG = 1;
 
-    /** Menu ID for the command to  the window. */
-    private static final int CLEAR_ID = Menu.FIRST;
-    /** Menu ID for the command to toggle fading. */
-    private static final int FADE_ID = Menu.FIRST+1;
+
 
     /** How often to fade the contents of the window (in ms). */
     private static final int FADE_DELAY = 50;
@@ -54,70 +32,59 @@ public class TouchPaint extends GraphicsActivity {
     /** Is fading mode enabled? */
     boolean mFading;
 
-    @Override protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
-        // Create and attach the view that is responsible for painting.
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        // Not used
+        return null;
+    }
+
+    final WindowManager.LayoutParams params = new WindowManager.LayoutParams(
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.TYPE_PHONE,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+
+            PixelFormat.TRANSLUCENT);
+
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        windowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
+
+
         mView = new MyView(this);
-        setContentView(mView);
-        mView.requestFocus();
+//        mView.setLayoutParams(new ViewGroup.LayoutParams(500,500));
 
-        // Restore the fading option if we are being thawed from a
-        // previously saved state.  Note that we are not currently remembering
-        // the contents of the bitmap.
-        mFading = savedInstanceState != null ? savedInstanceState.getBoolean("fading", true) : true;
-    }
 
-    @Override public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, CLEAR_ID, 0, "Clear");
-        menu.add(0, FADE_ID, 0, "Fade").setCheckable(true);
-        return super.onCreateOptionsMenu(menu);
-    }
+        params.width = WindowManager.LayoutParams.MATCH_PARENT;
+        params.height = 1000;
 
-    @Override public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(FADE_ID).setChecked(mFading);
-        return super.onPrepareOptionsMenu(menu);
-    }
 
-    @Override public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case CLEAR_ID:
-                mView.clear();
-                return true;
-            case FADE_ID:
-                mFading = !mFading;
-                if (mFading) {
-                    startFading();
-                } else {
-                    stopFading();
-                }
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+                                                              // vie
+//        chatHead = new ImageView(this);
+//        chatHead.setElevation(20);
+//        updateImage(R.drawable.skulduggerycool);//image is your image
 
-    @Override protected void onResume() {
-        super.onResume();
-        // If fading mode is enabled, then as long as we are resumed we want
-        // to run pulse to fade the contents.
-        if (mFading) {
-            startFading();
-        }
-    }
 
-    @Override protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        // Save away the fading state to restore if needed later.  Note that
-        // we do not currently save the contents of the display.
-        outState.putBoolean("fading", mFading);
-    }
 
-    @Override protected void onPause() {
-        super.onPause();
-        // Make sure to never run the fading pulse while we are paused or
-        // stopped.
-        stopFading();
+        params.gravity = Gravity.TOP | Gravity.LEFT;
+        ChatHeadService.params.x=10;
+        ChatHeadService.params.y=50;
+        params.x = ChatHeadService.params.x;
+        params.y = ChatHeadService.params.y + 150 + 15;
+        ChatHeadService.moveable = false;
+        windowManager.addView(mView, params);
+        ChatHeadService.windowManager.updateViewLayout(ChatHeadService.chatHead, ChatHeadService.params);
+
+
+
+
+
+
     }
 
     /**
@@ -128,6 +95,14 @@ public class TouchPaint extends GraphicsActivity {
         mHandler.removeMessages(FADE_MSG);
         mHandler.sendMessageDelayed(
                 mHandler.obtainMessage(FADE_MSG), FADE_DELAY);
+    }
+
+    @Override
+            public void onDestroy()
+    {
+        mHandler.removeCallbacksAndMessages(null);
+        windowManager.removeView(mView);
+
     }
 
     /**
@@ -155,7 +130,7 @@ public class TouchPaint extends GraphicsActivity {
         }
     };
 
-    public static class MyView extends View {
+    public class MyView extends View {
         private static final int FADE_ALPHA = 0x06;
         private static final int MAX_FADE_STEPS = 256/FADE_ALPHA + 4;
         private static final int TRACKBALL_SCALE = 10;
@@ -178,6 +153,7 @@ public class TouchPaint extends GraphicsActivity {
             mFadePaint = new Paint();
             mFadePaint.setDither(true);
             mFadePaint.setARGB(FADE_ALPHA, 0, 0, 0);
+            startFading();
         }
 
         public void clear() {
@@ -210,6 +186,8 @@ public class TouchPaint extends GraphicsActivity {
 
             Bitmap newBitmap = Bitmap.createBitmap(curW, curH,
                     Bitmap.Config.RGB_565);
+//            Bitmap newBitmap = Bitmap.createBitmap(150, 150,
+//                    Bitmap.Config.RGB_565);
             Canvas newCanvas = new Canvas();
             newCanvas.setBitmap(newBitmap);
             if (mBitmap != null) {
@@ -263,7 +241,7 @@ public class TouchPaint extends GraphicsActivity {
                         //Start adding extra circles here
                         if(i< N-1)
                         {
-                             midx = (mCurX + event.getHistoricalX(j, i+1))/2.0f;
+                            midx = (mCurX + event.getHistoricalX(j, i+1))/2.0f;
                             midy = (mCurY + event.getHistoricalY(j, i+1))/2.0f;
                             drawPoint( midx, midy,
                                     event.getHistoricalPressure(j, i+1),
@@ -309,7 +287,7 @@ public class TouchPaint extends GraphicsActivity {
 
 
 //                mPaint.setShader(gradient);
-                                                                                // set color gradient here
+                // set color gradient here
                 mPaint.setARGB(pressureLevel, 255, 102, 102);
 
 
