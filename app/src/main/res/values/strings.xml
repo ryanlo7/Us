@@ -7,4 +7,9 @@
     <string name="title_activity_sign_up">SignUp</string>
     <string name="title_activity_touch_paint">TouchPaint</string>
     <string name="title_activity_graphics">GraphicsActivity</string>
+
+    <string name="title_activity_graph">GraphActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_chart">ChartActivity</string>
 </resources>

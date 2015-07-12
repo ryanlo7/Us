@@ -50,7 +50,7 @@ public class ChatHeadService extends Service {
         Bitmap bmp=Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);;//image is your image
         bmp.eraseColor(Color.RED);
 //        bmp=Bitmap.createScaledBitmap(bmp, width,height, true);
-        bmp = getRoundedShape(bmp); 
+        bmp = getRoundedShape(bmp);
         chatHead.setImageBitmap(bmp);
     }
 
