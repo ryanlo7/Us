@@ -6,11 +6,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.github.mikephil.charting.charts.BarChart;
+import com.github.mikephil.charting.charts.ScatterChart;
+import com.parse.ParseException;
 import com.parse.ParseUser;
 
 
 public class MainActivity extends AppCompatActivity {
 
+    private BarChart bchart;
+    private ScatterChart schart;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,48 +28,22 @@ public class MainActivity extends AppCompatActivity {
         }
         else
         {
-            String id = currentUser.getObjectId();
-
-//            try {
-//                UsApp.pubnub.subscribe(currentUser.getObjectId(), new Callback() {
+            try {
+                currentUser.fetchIfNeeded();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+//            String id = currentUser.getObjectId();
+            UsApp.myId= currentUser.getObjectId();
 //
-//                    @Override
-//                    public void connectCallback(String channel, Object message) {
-//                        UsApp.pubnub.publish("my_channel", "Hello from the PubNub Java SDK", new Callback() {});
-//                    }
-//
-//                    @Override
-//                    public void disconnectCallback(String channel, Object message) {
-//                        System.out.println("SUBSCRIBE : DISCONNECT on channel:" + channel
-//                                + " : " + message.getClass() + " : "
-//                                + message.toString());
-//                    }
-//
-//                    public void reconnectCallback(String channel, Object message) {
-//                        System.out.println("SUBSCRIBE : RECONNECT on channel:" + channel
-//                                + " : " + message.getClass() + " : "
-//                                + message.toString());
-//                    }
-//
-//                    @Override
-//                    public void successCallback(String channel, Object message) {
-//                        System.out.println("SUBSCRIBE : " + channel + " : "
-//                                + message.getClass() + " : " + message.toString());
-//                    }
-//
-//                    @Override
-//                    public void errorCallback(String channel, PubnubError error) {
-//                        System.out.println("SUBSCRIBE : ERROR on channel " + channel
-//                                + " : " + error.toString());
-//                    }
-//                });
-//            }
-//            catch(PubnubException e)
-//            {
-//                System.out.print( e);
-//            }
-//        }
         }
+        bchart = (BarChart) findViewById(R.id.bchart);
+        schart = (ScatterChart) findViewById(R.id.schart);
+
+
+
+        int[] data =  (int[])currentUser.get("modelHistory");
+
         startService(new Intent(getApplicationContext(), ChatHeadService.class));
 
 //        Intent intent = new Intent(this, TouchPaint.class);
@@ -106,3 +85,43 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 }
+
+
+//try {
+//                UsApp.pubnub.subscribe(currentUser.getObjectId(), new Callback() {
+//
+//                    @Override
+//                    public void connectCallback(String channel, Object message) {
+//                        UsApp.pubnub.publish(UsApp.myId, "Hello from the PubNub Java SDK", new Callback() {});
+//                    }
+//
+//                    @Override
+//                    public void disconnectCallback(String channel, Object message) {
+//                        System.out.println("SUBSCRIBE : DISCONNECT on channel:" + channel
+//                                + " : " + message.getClass() + " : "
+//                                + message.toString());
+//                    }
+//
+//                    public void reconnectCallback(String channel, Object message) {
+//                        System.out.println("SUBSCRIBE : RECONNECT on channel:" + channel
+//                                + " : " + message.getClass() + " : "
+//                                + message.toString());
+//                    }
+//
+//                    @Override
+//                    public void successCallback(String channel, Object message) {
+//                        System.out.println("SUBSCRIBE : " + channel + " : "
+//                                + message.getClass() + " : " + message.toString());
+//                    }
+//
+//                    @Override
+//                    public void errorCallback(String channel, PubnubError error) {
+//                        System.out.println("SUBSCRIBE : ERROR on channel " + channel
+//                                + " : " + error.toString());
+//                    }
+//                });
+//            }
+//            catch(PubnubException e)
+//            {
+//                System.out.print( e);
+//            }
