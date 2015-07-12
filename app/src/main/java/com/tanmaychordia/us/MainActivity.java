@@ -9,6 +9,8 @@ import android.view.MenuItem;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.ScatterChart;
 import com.github.mikephil.charting.data.BarData;
+import com.github.mikephil.charting.data.BarDataSet;
+import com.github.mikephil.charting.data.BarEntry;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
@@ -37,23 +39,28 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 //            String id = currentUser.getObjectId();
-            UsApp.myId = currentUser.getObjectId();
+
+//            UsApp.myId= currentUser.getObjectId();
 //
 
             bchart = (BarChart) findViewById(R.id.bchart);
             schart = (ScatterChart) findViewById(R.id.schart);
 
+            ArrayList<String> xVals = new ArrayList<String>();
+            xVals.add("Happy");
+            xVals.add("Sad");
+            xVals.add("Angry");
+            xVals.add("Anxious");
 
             ArrayList<Integer> data = (ArrayList<Integer>) currentUser.get("moodHistory");
 
             System.out.println(data.isEmpty());
-            ArrayList<String> a = new ArrayList<String>();
-            for (int ab : data) {
-                a.add(ab + "");
-            }
-            System.out.println(a);
-            BarData bdata = new BarData(a);
 
+            BarDataSet bdset = new BarDataSet(getY(data), "Moods");
+            bdset.setBarSpacePercent(35f);
+            BarData bdata = new BarData(xVals, bdset);
+
+            bchart.setTouchEnabled(false);
             bchart.setData(bdata);
             bchart.setFocusable(true);
             bchart.setLogEnabled(true);
@@ -63,6 +70,23 @@ public class MainActivity extends AppCompatActivity {
 //        Intent intent = new Intent(this, TouchPaint.class);
 //        startActivity(intent);
         }
+
+    }
+
+    private ArrayList<BarEntry> getY(ArrayList<Integer> hist)
+    {
+        int[] ys = new int[4];
+        for(int a:hist)
+        {
+            ys[a-1]+=1;
+        }
+        ArrayList<BarEntry> yVals1 = new ArrayList<>();
+        for(int a = 0; a < ys.length; a++) {
+
+            yVals1.add(new BarEntry(ys[a], a));
+        }
+        return yVals1;
+
     }
 
     private void navigateToLogin() {
