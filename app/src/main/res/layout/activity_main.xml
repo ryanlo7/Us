@@ -18,13 +18,32 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
-        <com.github.mikephil.charting.charts.ScatterChart
-            android:id="@+id/schart"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+        <!--<com.github.mikephil.charting.charts.ScatterChart-->
+            <!--android:id="@+id/schart"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent" />-->
+
+        <!--<com.tanmay.us.colorpicker.LineColorPicker-->
+            <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
+            <!--android:id="@+id/picker"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="60dp"-->
+            <!--app:orientation="horizontal"/>-->
 
 
 
     </ScrollView>
+
+    <!--<com.github.mikephil.charting.charts.ScatterChart-->
+    <!--android:id="@+id/schart"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent" />-->
+
+    <com.tanmay.us.colorpicker.LineColorPicker
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/picker"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    app:orientation="horizontal"/>
 
 </RelativeLayout>
