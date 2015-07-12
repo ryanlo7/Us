@@ -8,8 +8,11 @@ import android.view.MenuItem;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.ScatterChart;
+import com.github.mikephil.charting.data.BarData;
 import com.parse.ParseException;
 import com.parse.ParseUser;
+
+import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -42,7 +45,9 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        int[] data =  (int[])currentUser.get("modelHistory");
+        ArrayList<String> data =  (ArrayList<String>)currentUser.get("modelHistory");
+
+        BarData bdata = new BarData(data);
 
         startService(new Intent(getApplicationContext(), ChatHeadService.class));
 
